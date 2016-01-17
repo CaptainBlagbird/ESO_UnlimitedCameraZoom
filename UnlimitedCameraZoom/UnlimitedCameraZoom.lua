@@ -9,7 +9,7 @@ https://github.com/CaptainBlagbird
 -- Constants
 local ZOOM_MAX  = 10
 local ZOOM_MIN  = 2
-local ZOOM_POV  = 0
+local ZOOM_FPV  = 0
 local ZOOM_STEP = 0.5
 
 -- Local variables
@@ -24,12 +24,12 @@ end
 local origToggleGameCameraFirstPerson = ToggleGameCameraFirstPerson
 ToggleGameCameraFirstPerson = function(...)
 	local zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
-	if IsZoomLimited() or zoom <= ZOOM_POV then
-		if zoom <= ZOOM_POV then
+	if IsZoomLimited() or zoom <= ZOOM_FPV then
+		if zoom <= ZOOM_FPV then
 			SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, lastZoom)
 		else
 			lastZoom = zoom
-			SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, ZOOM_POV)
+			SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, ZOOM_FPV)
 		end
 	else  -- Zoom is not limited
 		origToggleGameCameraFirstPerson(...)
@@ -44,7 +44,7 @@ CameraZoomIn = function(...)
 		origCameraZoomIn(...)
 	else  -- Within limited zoom range
 		local newZoom = zoom - ZOOM_STEP
-		if newZoom < ZOOM_POV then newZoom = ZOOM_POV end
+		if newZoom < ZOOM_FPV then newZoom = ZOOM_FPV end
 		-- Only change setting if newZoom is different from current zoom
 		if newZoom < zoom then
 			SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
