@@ -39,12 +39,13 @@ end
 -- Overwrite original function
 local origCameraZoomIn = CameraZoomIn
 CameraZoomIn = function(...)
-	if IsGameCameraSiegeControlled() then
+	local zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
+	if IsGameCameraSiegeControlled() or zoom > ZOOM_MIN then
 		origCameraZoomIn(...)
-	else
-		local zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
+	else  -- Within limited zoom range
 		local newZoom = zoom - ZOOM_STEP
 		if newZoom < ZOOM_POV then newZoom = ZOOM_POV end
+		-- Only change setting if newZoom is different from current zoom
 		if newZoom < zoom then
 			SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
 			-- Remember zoom for FPV toggle
@@ -56,14 +57,11 @@ end
 -- Overwrite original function
 local origCameraZoomOut = CameraZoomOut
 CameraZoomOut = function(...)
-	if IsGameCameraSiegeControlled() then
+	local zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
+	if IsGameCameraSiegeControlled() or zoom >= ZOOM_MIN then
 		origCameraZoomOut(...)
-	else
-		local zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
+	else  -- Within limited zoom range
 		local newZoom = zoom + ZOOM_STEP
-		if newZoom > ZOOM_MAX then newZoom = ZOOM_MAX end
-		if newZoom > zoom then
-			SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
-		end
+		SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
 	end
 end
