@@ -6,6 +6,10 @@ https://github.com/CaptainBlagbird
 
 --]]
 
+-- Addon info
+UnlimitedCameraZoom = {}
+UnlimitedCameraZoom.name = "UnlimitedCameraZoom"
+
 -- Constants
 local ZOOM_MAX  = 10
 local ZOOM_MIN  = 2
@@ -27,9 +31,11 @@ ToggleGameCameraFirstPerson = function(...)
     if IsZoomLimited() or zoom <= ZOOM_FPV then
         if zoom <= ZOOM_FPV then
             SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, lastZoom)
+            savedVars.zoom = lastZoom
         else
             lastZoom = zoom
             SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, ZOOM_FPV)
+            savedVars.zoom = ZOOM_FPV
         end
     else  -- Zoom is not limited
         origToggleGameCameraFirstPerson(...)
@@ -48,6 +54,7 @@ CameraZoomIn = function(...)
         -- Only change setting if newZoom is different from current zoom
         if newZoom < zoom then
             SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
+            savedVars.zoom = newZoom
             -- Remember zoom for FPV toggle
             lastZoom = zoom
         end
@@ -63,5 +70,21 @@ CameraZoomOut = function(...)
     else  -- Within limited zoom range
         local newZoom = zoom + ZOOM_STEP
         SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
+        savedVars.zoom = newZoom
     end
 end
+
+-- Event handler function for EVENT_PLAYER_ACTIVATED
+local function OnPlayerActivated(event)
+    SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, savedVars.zoom)
+end
+
+-- Event handler function for EVENT_PLAYER_ACTIVATED (only the first time)
+local function OnInit(event)
+    -- Set up Saved Variables
+    savedVars = ZO_SavedVars:New(UnlimitedCameraZoom.name.."_SavedVariables", 1, nil, {["zoom"]=lastZoom})
+    
+    EVENT_MANAGER:UnregisterForEvent(UnlimitedCameraZoom.name, EVENT_PLAYER_ACTIVATED)
+    EVENT_MANAGER:RegisterForEvent(UnlimitedCameraZoom.name, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
+end
+EVENT_MANAGER:RegisterForEvent(UnlimitedCameraZoom.name, EVENT_PLAYER_ACTIVATED, OnInit)

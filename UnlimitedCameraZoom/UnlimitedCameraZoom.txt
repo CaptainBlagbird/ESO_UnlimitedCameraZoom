@@ -3,6 +3,7 @@
 ## Author: |c70C0DECaptainBlagbird|r
 ## APIVersion: 100019
 ## Description: Allows the player to zoom unlimited between max zoom and first person view even when mounted or in werewolf form etc., including FPV toggling
+## SavedVariables: UnlimitedCameraZoom_SavedVariables
 
 UnlimitedCameraZoom.lua
 
