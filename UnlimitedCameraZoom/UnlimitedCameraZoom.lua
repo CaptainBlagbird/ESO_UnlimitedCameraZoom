@@ -31,15 +31,15 @@ ToggleGameCameraFirstPerson = function(...)
     if IsZoomLimited() or zoom <= ZOOM_FPV then
         if zoom <= ZOOM_FPV then
             SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, lastZoom)
-            savedVars.zoom = lastZoom
         else
             lastZoom = zoom
             SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, ZOOM_FPV)
-            savedVars.zoom = ZOOM_FPV
         end
     else  -- Zoom is not limited
         origToggleGameCameraFirstPerson(...)
     end
+    -- Remember new zoom
+    savedVars.zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
 end
 
 -- Overwrite original function
@@ -50,15 +50,18 @@ CameraZoomIn = function(...)
         origCameraZoomIn(...)
     else  -- Within limited zoom range
         local newZoom = zoom - ZOOM_STEP
-        if newZoom < ZOOM_FPV then newZoom = ZOOM_FPV end
+        if newZoom < ZOOM_FPV then
+            newZoom = ZOOM_FPV
+        end
         -- Only change setting if newZoom is different from current zoom
         if newZoom < zoom then
             SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
-            savedVars.zoom = newZoom
             -- Remember zoom for FPV toggle
             lastZoom = zoom
         end
     end
+    -- Remember new zoom
+    savedVars.zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
 end
 
 -- Overwrite original function
@@ -70,8 +73,9 @@ CameraZoomOut = function(...)
     else  -- Within limited zoom range
         local newZoom = zoom + ZOOM_STEP
         SetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE, newZoom)
-        savedVars.zoom = newZoom
     end
+    -- Remember new zoom
+    savedVars.zoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
 end
 
 -- Event handler function for EVENT_PLAYER_ACTIVATED
