@@ -17,6 +17,7 @@ local ZOOM_FPV  = 0
 local ZOOM_STEP = 0.5
 
 -- Local variables
+local savedVars = {}
 local lastZoom = tonumber(GetSetting(SETTING_TYPE_CAMERA, CAMERA_SETTING_DISTANCE))
 
 
